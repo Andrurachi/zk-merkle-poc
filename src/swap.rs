@@ -1,4 +1,9 @@
-use halo2_proofs::{arithmetic::Field, circuit::*, plonk::*, poly::Rotation};
+use halo2_proofs::{
+    arithmetic::Field,
+    circuit::{AssignedCell, Layouter, Value},
+    plonk::*,
+    poly::Rotation,
+};
 use std::marker::PhantomData;
 
 // Configuration struct
@@ -77,5 +82,46 @@ impl<F: Field> SwapChip<F> {
             node,
             sibling,
         }
+    }
+
+    // Builder function
+    // Prover plugs in the private data
+    pub fn assign(
+        &self,
+        mut layouter: impl Layouter<F>,
+        bit: Value<F>,
+        node: Value<F>,
+        sibling: Value<F>,
+    ) -> Result<(AssignedCell<F, F>, AssignedCell<F, F>), halo2_proofs::plonk::Error> {
+        // Ask memory manager for a blank block of rows
+        Ok(layouter.assign_region(
+            || "Swap logic region",
+            |mut region| {
+                // Turn on the math rules for row 0 (offset 0)
+                self.config.s_swap.enable(&mut region, 0)?;
+
+                // Write the inputs into row 0
+                region.assign_advice(|| "bit", self.config.bit, 0, || bit)?;
+                region.assign_advice(|| "node", self.config.node, 0, || node)?;
+                region.assign_advice(|| "sibling", self.config.sibling, 0, || sibling)?;
+
+                // Calculate what the answers should be
+                // .zip and .map because the values might be "Unknown" during Key Generation
+                let (left_val, right_val) = bit
+                    .zip(node)
+                    .zip(sibling)
+                    .map(|((b, n), s)| if b == F::ONE { (s, n) } else { (n, s) })
+                    .unzip();
+
+                // Write the calculated outputs into row 1 (offset 1)
+                let left_cell =
+                    region.assign_advice(|| "left out", self.config.node, 1, || left_val)?;
+                let right_cell =
+                    region.assign_advice(|| "right out", self.config.sibling, 1, || right_val)?;
+
+                // Return the exact cells of R and L, so hash gadget can use them
+                Ok((left_cell, right_cell))
+            },
+        )?)
     }
 }
