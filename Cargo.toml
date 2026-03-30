@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v0.4.0" }
-halo2curves = { git = "https://github.com/privacy-scaling-explorations/halo2curves.git", tag = "v0.9.0" }
+halo2_proofs = { git = "https://github.com/privacy-ethereum/halo2.git", tag = "v0.4.0" }
+halo2curves = { git = "https://github.com/privacy-ethereum/halo2curves.git", tag = "v0.9.0" }
+halo2_poseidon = { git = "https://github.com/privacy-ethereum/poseidon-gadget.git" }
 ff = "0.13"

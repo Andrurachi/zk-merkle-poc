@@ -78,6 +78,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
+name = "byteorder"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
+
+[[package]]
 name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -122,6 +128,12 @@ name = "crossbeam-utils"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
+
+[[package]]
+name = "crunchy"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 
 [[package]]
 name = "crypto-common"
@@ -211,7 +223,7 @@ dependencies = [
 [[package]]
 name = "halo2_backend"
 version = "0.4.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
+source = "git+https://github.com/privacy-ethereum/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
 dependencies = [
  "blake2b_simd",
  "ff",
@@ -228,7 +240,7 @@ dependencies = [
 [[package]]
 name = "halo2_frontend"
 version = "0.4.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
+source = "git+https://github.com/privacy-ethereum/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
 dependencies = [
  "blake2b_simd",
  "ff",
@@ -241,7 +253,7 @@ dependencies = [
 [[package]]
 name = "halo2_middleware"
 version = "0.4.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
+source = "git+https://github.com/privacy-ethereum/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
 dependencies = [
  "ff",
  "halo2curves 0.7.0",
@@ -249,9 +261,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "halo2_poseidon"
+version = "0.2.0"
+source = "git+https://github.com/privacy-ethereum/poseidon-gadget.git#2478c86285a25c27ee75fd3a000f84b70a8ad231"
+dependencies = [
+ "arrayvec",
+ "bitvec",
+ "ff",
+ "group",
+ "halo2_proofs 0.3.0",
+ "halo2curves 0.6.1",
+ "lazy_static",
+ "rand",
+ "subtle",
+ "uint",
+]
+
+[[package]]
+name = "halo2_proofs"
+version = "0.3.0"
+source = "git+https://github.com/privacy-scaling-explorations/halo2?tag=v0.3.0#73408a140737d8336490452193b21f5a7a94e7de"
+dependencies = [
+ "blake2b_simd",
+ "ff",
+ "group",
+ "halo2curves 0.6.1",
+ "rand_chacha",
+ "rand_core",
+ "rayon",
+ "sha3",
+ "tracing",
+]
+
+[[package]]
 name = "halo2_proofs"
 version = "0.4.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
+source = "git+https://github.com/privacy-ethereum/halo2.git?tag=v0.4.0#7eb156ac79589093719ffdd24ccf4440d717e405"
 dependencies = [
  "group",
  "halo2_backend",
@@ -259,6 +304,28 @@ dependencies = [
  "halo2_middleware",
  "halo2curves 0.7.0",
  "rand_core",
+]
+
+[[package]]
+name = "halo2curves"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db81d01d0bbfec9f624d7590fc6929ee2537a64ec1e080d8f8c9e2d2da291405"
+dependencies = [
+ "blake2b_simd",
+ "ff",
+ "group",
+ "lazy_static",
+ "num-bigint",
+ "num-traits",
+ "pairing",
+ "pasta_curves",
+ "paste",
+ "rand",
+ "rand_core",
+ "rayon",
+ "static_assertions",
+ "subtle",
 ]
 
 [[package]]
@@ -291,7 +358,7 @@ dependencies = [
 [[package]]
 name = "halo2curves"
 version = "0.9.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2curves.git?tag=v0.9.0#4b7a69e6a3f1878b150c212d73ec82a3210c29f9"
+source = "git+https://github.com/privacy-ethereum/halo2curves.git?tag=v0.9.0#4b7a69e6a3f1878b150c212d73ec82a3210c29f9"
 dependencies = [
  "digest 0.10.7",
  "ff",
@@ -328,7 +395,7 @@ dependencies = [
 [[package]]
 name = "halo2derive"
 version = "0.2.0"
-source = "git+https://github.com/privacy-scaling-explorations/halo2curves.git?tag=v0.9.0#4b7a69e6a3f1878b150c212d73ec82a3210c29f9"
+source = "git+https://github.com/privacy-ethereum/halo2curves.git?tag=v0.9.0#4b7a69e6a3f1878b150c212d73ec82a3210c29f9"
 dependencies = [
  "num-bigint",
  "num-integer",
@@ -337,6 +404,12 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
+
+[[package]]
+name = "hex"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "keccak"
@@ -640,6 +713,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "562d481066bde0658276a35467c4af00bdc6ee726305698a55b86e61d7ad82bb"
 
 [[package]]
+name = "uint"
+version = "0.9.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76f64bba2c53b04fcab63c01a7d7427eadc821e3bc48c34dc9ba29c501164b52"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "hex",
+ "static_assertions",
+]
+
+[[package]]
 name = "unicode-ident"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -701,6 +786,7 @@ name = "zk-merkle-poc"
 version = "0.1.0"
 dependencies = [
  "ff",
- "halo2_proofs",
+ "halo2_poseidon",
+ "halo2_proofs 0.4.0",
  "halo2curves 0.9.0",
 ]
