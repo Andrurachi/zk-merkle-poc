@@ -1,2 +1,2 @@
-pub mod swap;
 pub mod merkle;
+pub mod swap;
