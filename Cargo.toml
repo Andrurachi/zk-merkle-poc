@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-halo2_proofs = { git = "https://github.com/privacy-ethereum/halo2.git", tag = "v0.4.0" }
-halo2curves = { git = "https://github.com/privacy-ethereum/halo2curves.git", tag = "v0.9.0" }
-halo2_poseidon = { git = "https://github.com/privacy-ethereum/poseidon-gadget.git" }
+# v0.3.0 due to compatibility with halo2_poseidon dependencies
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v0.3.0" }
+
+# It is better to get this from crates.io to avoid two "distinct" versions living on the project (crates.io and github)
+halo2curves = "0.6.1"
+
+halo2_poseidon = { git = "https://github.com/privacy-scaling-explorations/poseidon-gadget.git" }
 ff = "0.13"
