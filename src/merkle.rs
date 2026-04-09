@@ -44,6 +44,10 @@ impl<F: PrimeField, S: Spec<F, WIDTH, RATE>> Circuit<F> for MerklePathCircuit<F,
         // Pass the drafting table to the SwapChip
         let swap_config = SwapChip::configure(meta);
 
+        // Create a dedicated column for constants (fix NotEnoughColumnsForConstants error)
+        let constant_col = meta.fixed_column();
+        meta.enable_constant(constant_col);
+
         // Pass the drafting table to the Poseidon hash chip (width 3 = 3 state columns are required)
         let state = [
             meta.advice_column(),
@@ -146,5 +150,54 @@ impl<F: PrimeField, S: Spec<F, WIDTH, RATE>> Circuit<F> for MerklePathCircuit<F,
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use halo2_proofs::{
+        dev::MockProver,
+        halo2curves::pasta::Fp, 
+    };
+    // PSE standard Poseidon Spec (128-bit security, width=3)
+    use halo2_poseidon::poseidon::primitives::P128Pow5T3;
+
+    #[test]
+    fn test_merkle_path_math() {
+        // Circuit size (Spreadsheet will have 2^k rows)
+        let k = 8; // The circuit is tiny, so 256 rows are enough 
+
+        // The private data
+        // Normally, this is a 256-bit hashed numbers. For testing simple numbers is valid
+        let leaf = Fp::from(100);
+
+        // A two level merkle tree path
+        let siblings = vec![
+            Fp::from(200), // Level 0 sibling
+            Fp::from(300), // Level 1 sibling
+        ];
+
+        // Path bits (0 = current is left, 1 = current is right)
+        let bits = vec![
+            Fp::from(0), // Level 0: Leaf is Left, Sibling is Right
+            Fp::from(1), // Level 1: Current is Right, Sibling is Left
+        ];
+
+        // Wrap the data in Value::Known()
+        let path_elements: Vec<Value<Fp>> = siblings.iter().map(|v| Value::known(*v)).collect();
+        let path_indices: Vec<Value<Fp>> = bits.iter().map(|v| Value::known(*v)).collect();
+
+        // Instantiate the motherboard circuit with the Field and the Poseidon spec
+        let circuit = MerklePathCircuit::<Fp, P128Pow5T3> {
+            leaf: Value::known(leaf),
+            path_elements,
+            path_indices,
+            _marker: PhantomData,
+        };
+
+        // Run the MockProver
+        let prover = MockProver::run(k, &circuit, vec![]).unwrap(); // vec is empty because there is no Public Inputs yet
+        prover.assert_satisfied();
     }
 }
