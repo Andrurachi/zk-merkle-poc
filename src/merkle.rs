@@ -158,15 +158,29 @@ mod tests {
     use super::*;
     use halo2_proofs::{
         dev::MockProver,
-        halo2curves::pasta::Fp, 
+        halo2curves::pasta::{EqAffine, Fp},
+        plonk::{create_proof, keygen_pk, keygen_vk, verify_proof},
+        poly::{
+            commitment::ParamsProver,
+            ipa::{
+                commitment::{IPACommitmentScheme, ParamsIPA},
+                multiopen::ProverIPA,
+                strategy::SingleStrategy,
+            },
+            VerificationStrategy,
+        },
+        transcript::{
+            Blake2bRead, Blake2bWrite, Challenge255, TranscriptReadBuffer, TranscriptWriterBuffer,
+        },
     };
+    use rand_core::OsRng;
     // PSE standard Poseidon Spec (128-bit security, width=3)
     use halo2_poseidon::poseidon::primitives::P128Pow5T3;
 
     #[test]
     fn test_merkle_path_math() {
         // Circuit size (Spreadsheet will have 2^k rows)
-        let k = 8; // The circuit is tiny, so 256 rows are enough 
+        let k = 8; // The circuit is tiny, so 256 rows are enough
 
         // The private data
         // Normally, this is a 256-bit hashed numbers. For testing simple numbers is valid
@@ -199,5 +213,63 @@ mod tests {
         // Run the MockProver
         let prover = MockProver::run(k, &circuit, vec![]).unwrap(); // vec is empty because there is no Public Inputs yet
         prover.assert_satisfied();
+    }
+
+    #[test]
+    fn test_real_snark_proof() {
+        let k = 8;
+
+        // Setup parameters
+        println!("1. Generating setup parameters...");
+        let params: ParamsIPA<EqAffine> = ParamsIPA::new(k);
+
+        // Papare circuit with the data
+        let leaf = Fp::from(100);
+        let siblings = vec![Fp::from(200), Fp::from(300)];
+        let bits = vec![Fp::from(0), Fp::from(1)];
+
+        let path_elements: Vec<Value<Fp>> = siblings.iter().map(|v| Value::known(*v)).collect();
+        let path_indices: Vec<Value<Fp>> = bits.iter().map(|v| Value::known(*v)).collect();
+
+        let circuit = MerklePathCircuit::<Fp, P128Pow5T3> {
+            leaf: Value::known(leaf),
+            path_elements,
+            path_indices,
+            _marker: PhantomData,
+        };
+
+        // Generate the keys
+        // The proving key (pk) and verifying key (vk)
+        println!("2. Generating proving and verifying keys...");
+        let vk = keygen_vk(&params, &circuit).expect("vk generation failed");
+        let pk = keygen_pk(&params, vk, &circuit).expect("pk generation failed");
+
+        // Generate the proof
+        println!("3. Generating the SNARK proof...");
+        let mut transcript = Blake2bWrite::<_, _, Challenge255<_>>::init(vec![]);
+
+        create_proof::<IPACommitmentScheme<_>, ProverIPA<_>, _, _, _, _>(
+            &params,
+            &pk,
+            &[circuit],
+            &[&[]], // No public inputs for now
+            OsRng,
+            &mut transcript,
+        )
+        .expect("proof generation failed");
+
+        // the proof variable is the binary payload that would be send over the network
+        let proof: Vec<u8> = transcript.finalize();
+        println!("Proof generated successfully! Size: {} bytes", proof.len());
+
+        // Verify the proof
+        println!("4. Verifying the proof...");
+        let strategy = SingleStrategy::new(&params);
+        let mut transcript = Blake2bRead::<_, _, Challenge255<_>>::init(&proof[..]);
+
+        verify_proof(&params, pk.get_vk(), strategy, &[&[]], &mut transcript)
+            .expect("proof verification failed!");
+
+        println!("Proof verified successfully!");
     }
 }
