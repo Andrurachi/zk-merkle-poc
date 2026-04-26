@@ -1,16 +1,12 @@
 # ZK Merkle PoC: A Halo2 Zero-Knowledge Implementation
 
-This book contains my design notes, research, and implementation details for a Zero-Knowledge Merkle Tree inclusion prover built using the `halo2_proofs` framework. 
-
-Use the sidebar on the left to navigate, or see the main components below.
-
 This project was developed as an exploration of Plonkish arithmetization, custom circuit design, and SNARK generation.
 
 ### Project Components
-* **Swap Gadget:** A custom Halo2 microchip that conditionally swaps Left/Right tree nodes based on a private path bit.
+* **[Swap Gadget](https://hackmd.io/@Andrurachi/SkON2Sshbg):** A custom Halo2 microchip that conditionally swaps Left/Right tree nodes based on a private path bit.
 * **Poseidon Gadget Integration:** Implementation of the Privacy Scaling Explorations (PSE) highly optimized Poseidon hash.
-* **Merkle Motherboard:** The hierarchical circuit that wires the sub-components together to process an entire Merkle path.
-* **Execution Pipeline:** The testing infrastructure, moving from mathematical mock proving to generating a real `2688-byte` binary SNARK payload, and then verifying it.
+* **[Merkle Motherboard](https://hackmd.io/@Andrurachi/BybLhBjhbg):** The hierarchical circuit that wires the sub-components together to process an entire Merkle path.
+* **[Execution Pipeline](https://hackmd.io/@Andrurachi/H1RNGUj3-x):** The testing infrastructure, moving from mathematical mock proving to generating a real `2688-byte` binary SNARK payload, and then verifying it.
 
 ---
 
